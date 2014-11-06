@@ -37,8 +37,14 @@ class Tree(Object):
         print "hi"
 
 
-World = PyMakerWorld()
-#World.add_object(0, 0, GameTimer)
+Room = PyMakerRoom()
+Room.add_object(0, 0, Tree)
+Room.add_object(0, 0, Tree)
+Room.add_object(100, 0, Tree)
+Room.add_object(0, 0, Tree)
+Room.add_object(0, 0, Tree)
+
+Room.destroy(Room.type_nearest(100, 0, Tree))
 
 while running:
     for event in pygame.event.get():
@@ -46,7 +52,7 @@ while running:
             running = False
 
     #make all objects in world preform step event
-    World.world_step()
+    Room.room_step()
 
 
     pygame.display.flip()

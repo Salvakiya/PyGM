@@ -146,12 +146,12 @@ class PyMakerRoom_OLD_DO_NOT_USE:
 
 class PyMakerRoom:
     def __init__(self):
-        self.object_dictionary = {}
+        PyMakerRoom.object_dictionary = {}
         self.object_type_dict = {}
         self.object_id_counter = 0
 
     def room_step(self):
-        for obj in self.object_dictionary.values():
+        for obj in PyMakerRoom.object_dictionary.values():
             obj.event_step()
 
     #this method will create a type list when we actually need it
@@ -162,7 +162,7 @@ class PyMakerRoom:
             self.object_type_dict[name.__name__] = []
 
             #iterate through all objects to add to the list
-            for obj in self.object_dictionary.values():
+            for obj in PyMakerRoom.object_dictionary.values():
                 if obj.__class__.__name__ == name.__name__:
                     obj.type_id = len(self.object_type_dict[name.__name__])
                     self.object_type_dict[name.__name__].append(obj.myid)
@@ -184,12 +184,12 @@ class PyMakerRoom:
             assign_type_id = len(self.object_type_dict[obj.__name__])
 
         #finally we create the object
-        self.object_dictionary[assign_id] = obj(x=x, y=y, myid=assign_id, type_id=assign_type_id)
+        PyMakerRoom.object_dictionary[assign_id] = obj(x=x, y=y, myid=assign_id, type_id=assign_type_id)
 
     def object_nearest(self, x, y):
         tracking_distance = -1
         object_id = -1
-        for obj in self.object_dictionary.values():
+        for obj in PyMakerRoom.object_dictionary.values():
             distance = sqrt((x-obj.x)**2+(y-obj.y)**2)
             if tracking_distance == -1 or distance < tracking_distance:
                 tracking_distance = distance
@@ -220,8 +220,8 @@ class PyMakerRoom:
         #being freeing it when it should be
         #freed
         if position != -1:
-            if position in self.object_dictionary:
-                return self.object_dictionary[position]
+            if position in PyMakerRoom.object_dictionary:
+                return PyMakerRoom.object_dictionary[position]
 
     def instance_destroy(self, destroy_id):
         #if we are given an instance instead of an id
@@ -229,7 +229,7 @@ class PyMakerRoom:
         if isinstance(destroy_id, Object):
             destroy_id = destroy_id.myid
 
-        instance_to_destroy = self.object_dictionary[destroy_id]
+        instance_to_destroy = PyMakerRoom.object_dictionary[destroy_id]
         instance_to_destroy.destroy()
 
         if instance_to_destroy.__class__.__name__ in self.object_type_dict:
@@ -240,4 +240,4 @@ class PyMakerRoom:
                 #if there will be remaining objects we wont delete the list but remove the entry.
                 self.object_type_dict[instance_to_destroy.__class__.__name__].pop(instance_to_destroy.type_id)
 
-        self.object_dictionary.pop(destroy_id)
+        PyMakerRoom.object_dictionary.pop(destroy_id)

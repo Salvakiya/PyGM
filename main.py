@@ -44,7 +44,7 @@ Room.add_object(100, 0, Tree)
 Room.add_object(0, 0, Tree)
 Room.add_object(0, 0, Tree)
 
-Room.destroy(Room.type_nearest(100, 0, Tree))
+Room.instance_destroy(Room.type_nearest(100, 0, Tree))
 
 while running:
     for event in pygame.event.get():

@@ -144,100 +144,110 @@ class PyMakerRoom_OLD_DO_NOT_USE:
 
         self.object_list[destroyid] = None
 
-class PyMakerRoom:
-    def __init__(self):
-        PyMakerRoom.object_dictionary = {}
-        self.object_type_dict = {}
-        self.object_id_counter = 0
 
-    def room_step(self):
-        for obj in PyMakerRoom.object_dictionary.values():
+class NewGameRoom:
+    object_dictionary = {}
+    object_type_dict = {}
+    object_id_counter = 0
+
+    def __init__(self):
+        pass
+
+    @staticmethod
+    def room_step():
+        for obj in NewGameRoom.object_dictionary.values():
             obj.event_step()
 
     #this method will create a type list when we actually need it
     #some classes will never get a type list.
-    def add_object_type_list(self, name):
-        if not name.__name__ in self.object_type_dict:
+    @staticmethod
+    def add_object_type_list(name):
+        if not name.__name__ in NewGameRoom.object_type_dict:
             #create the list
-            self.object_type_dict[name.__name__] = []
+            NewGameRoom.object_type_dict[name.__name__] = []
 
             #iterate through all objects to add to the list
-            for obj in PyMakerRoom.object_dictionary.values():
+            for obj in NewGameRoom.object_dictionary.values():
                 if obj.__class__.__name__ == name.__name__:
-                    obj.type_id = len(self.object_type_dict[name.__name__])
-                    self.object_type_dict[name.__name__].append(obj.myid)
+                    obj.type_id = len(NewGameRoom.object_type_dict[name.__name__])
+                    NewGameRoom.object_type_dict[name.__name__].append(obj.myid)
 
-    def add_object(self, x, y, obj):
+    @staticmethod
+    def add_object(x, y, obj):
         #find the id to assign to object
-        assign_id = self.object_id_counter
-        self.object_id_counter += 1
+        assign_id = NewGameRoom.object_id_counter
+        NewGameRoom.object_id_counter += 1
         assign_type_id = -1
 
         #we only will add our type if this object requires such a thing
         #this is for performance issues that may come later on.
         #a "tree" or "rock" may not need to be iterated through for calculations
-        if obj.__name__ in self.object_type_dict:
+        if obj.__name__ in NewGameRoom.object_type_dict:
             #we tell the type list where to find us in the object_list
-            self.object_type_dict[obj.__name__].append(assign_id)
+            NewGameRoom.object_type_dict[obj.__name__].append(assign_id)
 
             #find the type id or sub id
-            assign_type_id = len(self.object_type_dict[obj.__name__])
+            assign_type_id = len(NewGameRoom.object_type_dict[obj.__name__])
 
         #finally we create the object
-        PyMakerRoom.object_dictionary[assign_id] = obj(x=x, y=y, myid=assign_id, type_id=assign_type_id)
+        NewGameRoom.object_dictionary[assign_id] = obj(x=x, y=y, myid=assign_id, type_id=assign_type_id)
 
-    def object_nearest(self, x, y):
+    @staticmethod
+    def object_nearest(x, y):
         tracking_distance = -1
         object_id = -1
-        for obj in PyMakerRoom.object_dictionary.values():
+        for obj in NewGameRoom.object_dictionary.values():
             distance = sqrt((x-obj.x)**2+(y-obj.y)**2)
             if tracking_distance == -1 or distance < tracking_distance:
                 tracking_distance = distance
                 object_id = obj.myid
         return object_id
 
-    def type_nearest(self, x, y, mtype):
+    @staticmethod
+    def type_nearest(x, y, mtype):
         #if we have not iterated through this type
         #we must create the list for this type
-        if not mtype.__name__ in self.object_type_dict:
-            self.add_object_type_list(mtype)
+        if not mtype.__name__ in NewGameRoom.object_type_dict:
+            NewGameRoom.add_object_type_list(mtype)
 
         tracking_distance = -1
         object_id = -1
-        for value in self.object_type_dict[mtype.__name__]:
+        for value in NewGameRoom.object_type_dict[mtype.__name__]:
             #remember object_index(id) references the object_list
-            obj = self.object_index(value)
+            obj = NewGameRoom.object_index(value)
             distance = sqrt((x-obj.x)**2+(y-obj.y)**2)
             if tracking_distance == -1 or distance < tracking_distance:
                 tracking_distance = distance
                 object_id = obj.myid
         return object_id
 
-    def object_index(self, position):
+    @staticmethod
+    def object_index(position):
         #CAUTION! Should be used carefully.
         #if not used properly you could
         #leave an object in the room without
         #being freeing it when it should be
         #freed
         if position != -1:
-            if position in PyMakerRoom.object_dictionary:
-                return PyMakerRoom.object_dictionary[position]
+            if position in NewGameRoom.object_dictionary:
+                return NewGameRoom.object_dictionary[position]
 
-    def instance_destroy(self, destroy_id):
+    @staticmethod
+    def instance_destroy(destroy_id):
         #if we are given an instance instead of an id
         #we will find the id to delete
         if isinstance(destroy_id, Object):
             destroy_id = destroy_id.myid
 
-        instance_to_destroy = PyMakerRoom.object_dictionary[destroy_id]
+        instance_to_destroy = NewGameRoom.object_dictionary[destroy_id]
         instance_to_destroy.destroy()
 
-        if instance_to_destroy.__class__.__name__ in self.object_type_dict:
+        if instance_to_destroy.__class__.__name__ in NewGameRoom.object_type_dict:
             #if killing this instance will delete the list
-            if len(self.object_type_dict[instance_to_destroy.__class__.__name__]) <= 1:
-                self.object_type_dict.pop(instance_to_destroy.__class__.__name__)
+            if len(NewGameRoom.object_type_dict[instance_to_destroy.__class__.__name__]) <= 1:
+                NewGameRoom.object_type_dict.pop(instance_to_destroy.__class__.__name__)
             else:
                 #if there will be remaining objects we wont delete the list but remove the entry.
-                self.object_type_dict[instance_to_destroy.__class__.__name__].pop(instance_to_destroy.type_id)
+                NewGameRoom.object_type_dict[instance_to_destroy.__class__.__name__].pop(instance_to_destroy.type_id)
 
-        PyMakerRoom.object_dictionary.pop(destroy_id)
+        NewGameRoom.object_dictionary.pop(destroy_id)

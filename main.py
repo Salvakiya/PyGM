@@ -37,14 +37,14 @@ class Tree(Object):
         print "hi"
 
 
-Room = PyMakerRoom()
-Room.add_object(0, 0, Tree)
-Room.add_object(0, 0, Tree)
-Room.add_object(100, 0, Tree)
-Room.add_object(0, 0, Tree)
-Room.add_object(0, 0, Tree)
+NewGameRoom()
+NewGameRoom.add_object(0, 0, Tree)
+NewGameRoom.add_object(0, 0, Tree)
+NewGameRoom.add_object(100, 0, Tree)
+NewGameRoom.add_object(0, 0, Tree)
+NewGameRoom.add_object(0, 0, Tree)
 
-Room.instance_destroy(Room.type_nearest(100, 0, Tree))
+NewGameRoom.instance_destroy(NewGameRoom.type_nearest(100, 0, Tree))
 
 while running:
     for event in pygame.event.get():
@@ -52,7 +52,7 @@ while running:
             running = False
 
     #make all objects in world preform step event
-    Room.room_step()
+    NewGameRoom.room_step()
 
 
     pygame.display.flip()

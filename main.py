@@ -11,10 +11,10 @@ frame_id = 1
 next_frame = time.time()
 
 
-class GameTimer(Object):
+class GameTimer(Entity):
     def __init__(self, **kw):
         super(GameTimer, self).__init__(**kw)
-        self.alarm_dictionary = {"print_complete": 100, "end_game": 500}
+        self.alarm = {"print_complete": 100, "end_game": 500}
 
     def print_complete(self):
         print "Completed!"
@@ -26,10 +26,10 @@ class GameTimer(Object):
 
     def event_step(self):
         super(GameTimer, self).event_step()
-        print self.alarm_dictionary
+        print self.alarm
 
 
-class Tree(Object):
+class Tree(Entity):
     def __init__(self, **kw):
         super(Tree, self).__init__(**kw)
 
@@ -38,7 +38,7 @@ class Tree(Object):
 
 
 NewGameRoom()
-NewGameRoom.add_object(0, 0, Tree)
+NewGameRoom.add_object(0, 0, GameTimer)
 NewGameRoom.add_object(0, 0, Tree)
 NewGameRoom.add_object(100, 0, Tree)
 NewGameRoom.add_object(0, 0, Tree)

@@ -1,7 +1,8 @@
 #Game Maker Object
 from math import sqrt
 
-class Object(object):
+
+class Entity(object):
     #all game classes inherit this class
     def __init__(self, x=0, y=0, myid=-1, type_id=-1):
         self.x = x
@@ -11,7 +12,7 @@ class Object(object):
         self.is_destroyed = False
         self.deactivated_id = -1
 
-        self.alarm_dictionary = {}
+        self.alarm = {}
 
     def is_activated(self):
         return self.deactivated_id == -1
@@ -24,24 +25,24 @@ class Object(object):
         #alarm stuff
         #usage: self.alarm_dictionary["MethodName"] = StepsToComplete
         #does not support arguments at this current time.
-        if len(self.alarm_dictionary) > 0:
+        if len(self.alarm) > 0:
             #make a list of alarms which ran out
             alarms_to_remove = []
 
-            for alarm in self.alarm_dictionary:
+            for method_alarm in self.alarm:
                 #count down the timer
-                self.alarm_dictionary[alarm] -= 1
+                self.alarm[method_alarm] -= 1
 
                 #if the timer has run out
-                if self.alarm_dictionary[alarm] < 0:
+                if self.alarm[method_alarm] < 0:
 
                     #dynamic alarms. Alarms names are actually method names
-                    if hasattr(self, alarm):
-                        perform = getattr(self, alarm)
+                    if hasattr(self, method_alarm):
+                        perform = getattr(self, method_alarm)
                         perform()
-                    alarms_to_remove.append(alarm)
-            for alarm in alarms_to_remove:
-                self.alarm_dictionary.pop(alarm)
+                    alarms_to_remove.append(method_alarm)
+            for method_alarm in alarms_to_remove:
+                self.alarm.pop(method_alarm)
 
     def event_draw(self):
         pass
@@ -128,7 +129,7 @@ class PyMakerRoom_OLD_DO_NOT_USE:
     def destroy(self, destroyid):
         #if we are given an instance instead of an id
         #we will find the id to delete
-        if isinstance(destroyid, Object):
+        if isinstance(destroyid, Entity):
             destroyid = destroyid.myid
 
         kill = self.object_list[destroyid]
@@ -236,7 +237,7 @@ class NewGameRoom:
     def instance_destroy(destroy_id):
         #if we are given an instance instead of an id
         #we will find the id to delete
-        if isinstance(destroy_id, Object):
+        if isinstance(destroy_id, Entity):
             destroy_id = destroy_id.myid
 
         instance_to_destroy = NewGameRoom.object_dictionary[destroy_id]

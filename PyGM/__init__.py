@@ -1,1 +1,1 @@
-__author__ = 'Salvakiya'
+__author__ = 'Salvakiya, Valeness'

@@ -7,9 +7,9 @@ def load_image(name):
     image = pygame.image.load(name)
     return image
 
-class Sprite(pygame.sprite.Sprite):
+class GMSprite(pygame.sprite.Sprite):
     def __init__(self):
-        super(Sprite, self).__init__()
+        super(GMSprite, self).__init__()
         self.images = []
         self.images.append(load_image('assets/stand1_0.png'))
         self.images.append(load_image('assets/stand1_1.png'))
@@ -29,11 +29,7 @@ class Sprite(pygame.sprite.Sprite):
 pygame.display.init()
 screen = pygame.display.set_mode((320, 240))
 
-sprite = Sprite()
-group = pygame.sprite.Group(sprite)
-
 FPS = 60
-frames = FPS / 12
 clock = pygame.time.Clock()
 
 running = True
@@ -58,8 +54,33 @@ class GameTimer(Entity):
 
     def event_step(self):
         super(GameTimer, self).event_step()
-        print self.alarm
+        #print self.alarm
 
+sprite = GMSprite()
+group = pygame.sprite.Group(sprite)
+
+class Character(Entity):
+    def __init__(self, **kw):
+        super(Character, self).__init__(**kw)
+        self.last = pygame.time.get_ticks()
+        self.cooldown = 500
+        self.alarm = {'stand': 11}
+
+    def stand(self):
+        if self.alarm['stand'] == 0:
+            self.alarm = {'stand': 10}
+            group.update()
+            group.draw(screen)
+        elif self.alarm['stand'] == 11:
+            self.alarm = {'stand': 10}
+            group.update()
+            group.draw(screen)
+
+    def event_step(self):
+        super(Character, self).event_step()
+        print self.alarm['stand']
+        
+    
 
 class Tree(Entity):
     def __init__(self, **kw):
@@ -76,8 +97,10 @@ class Tree(Entity):
 NewGameRoom()
 NewGameRoom.add_object(0, 0, GameTimer)
 NewGameRoom.add_object(0, 0, Tree)
+NewGameRoom.add_object(10, 10, Character)
 
 obj = NewGameRoom.object_index(1)
+char = NewGameRoom.object_index(2)
 
 #NewGameRoom.instance_destroy(NewGameRoom.type_nearest(100, 0, Tree))
 
@@ -89,13 +112,12 @@ while running:
         if keys[pygame.K_UP]:
             obj.sayhi()
 
+    char.stand()
+
     #make all objects in world preform step event
     NewGameRoom.room_step()
 
-    clock.tick(frames)
-
-    group.update()
-    group.draw(screen)
+    clock.tick(FPS)
 
     pygame.display.flip()
 
